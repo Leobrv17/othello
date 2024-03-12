@@ -7,37 +7,58 @@ class Board:
         self.fenetre.geometry('920x820')
         self.fenetre.title('Othello')
         self.menu = tk.Canvas(self.fenetre, width=920, height=820)
+        self.x_start = 200
+        self.y_start = 20
+        self.case_size = 700 // 8
         self.menu.pack()
         self.write_board()
+        self.turn = 0
+        self.menu.bind("<Button-1>", self.write_circle)
+
 
     def write_board(self):
         self.menu.create_rectangle(0, 0, 200, 820, fill="#2f1b0c")  # gauche
         self.menu.create_rectangle(200, 717, 920, 820, fill="#2f1b0c")  # Bas
         self.menu.create_rectangle(897, 20, 920, 717, fill="#2f1b0c")  # droite
         self.menu.create_rectangle(200, 0, 920, 20, fill="#2f1b0c")  # Haut
-        x_start = 200
-        y_start = 20
-        case_size = 700 // 8
 
         for i in range(8):  # 8 rangées
             for j in range(8):  # 8 colonnes
-                x0 = x_start + j * case_size
-                y0 = y_start + i * case_size
-                x1 = x0 + case_size
-                y1 = y0 + case_size
+                x0 = self.x_start + j * self.case_size
+                y0 = self.y_start + i * self.case_size
+                x1 = x0 + self.case_size
+                y1 = y0 + self.case_size
                 self.menu.create_rectangle(x0, y0, x1, y1, fill="#347940")
 
-        x_start = 200 + case_size // 2
+        x_start = 200 + self.case_size // 2
         y_start = 13
         lst = ["A", "B", "C", "D", "E", "F", "G", "H"]
         for i in range(8):
             self.menu.create_text(x_start, y_start, text=lst[i], fill="white", font=('Arial', 13))
-            x_start += case_size
+            x_start += self.case_size
 
         x_start = 905
-        y_start = 20 + case_size // 2
+        y_start = 20 + self.case_size // 2
         for i in range(8):
             self.menu.create_text(x_start, y_start, text=str(i + 1), fill="white", font=('Arial', 15))
-            y_start += case_size
+            y_start += self.case_size
 
         self.menu.create_text(100, 50, text="Othello", fill="white", font=('Arial', 30))
+
+    def write_circle(self, event):
+        col = (event.x - self.x_start) // self.case_size
+        row = (event.y - self.y_start) // self.case_size
+
+        if col >= 0 and row >= 0 and col < 8 and row < 8:  # Vérifier que le clic est dans une case valide
+            x_center = self.x_start + col * self.case_size + self.case_size // 2
+            y_center = self.y_start + row * self.case_size + self.case_size // 2
+            rayon = self.case_size // 2 - 5  # Un peu moins que la moitié pour s'adapter à la case
+
+            if self.turn == 0:
+                color = 'white'
+                self.turn = 1
+            else:
+                color = 'black'
+                self.turn = 0
+
+            self.menu.create_oval(x_center - rayon, y_center - rayon, x_center + rayon, y_center + rayon, fill=color)
