@@ -66,8 +66,9 @@ class Board:
     def calc_case(self, event):
         col = (event.x - self.x_start) // self.case_size
         row = (event.y - self.y_start) // self.case_size
+        print(row,col)
         if col >= 0 and row >= 0 and col < 8 and row < 8:
-            if self.matrice[row][col] == 0:
+            if self.matrice[row][col] == 0 and self.testGoodPosition(self.matrice,self.turn,row,col):
                 self.matrice[row][col] = self.turn
                 print(self.matrice)
 
@@ -117,3 +118,153 @@ class Board:
         count_ones = np.count_nonzero(self.matrice == 1)
         count_twos = np.count_nonzero(self.matrice == 2)
         return count_ones, count_twos
+
+    def testGoodPosition(self, board, jeton, ligne, colone):
+        possibilite = []
+        possibilite.append(self.verifN(board, jeton, ligne, colone))
+        possibilite.append(self.verifNO(board, jeton, ligne, colone))
+        possibilite.append(self.verifO(board, jeton, ligne, colone))
+        possibilite.append(self.verifSO(board, jeton, ligne, colone))
+        possibilite.append(self.verifS(board, jeton, ligne, colone))
+        possibilite.append(self.verifSE(board, jeton, ligne, colone))
+        possibilite.append(self.verifE(board, jeton, ligne, colone))
+        possibilite.append(self.verifNE(board, jeton, ligne, colone))
+        return np.any(possibilite)
+
+    def verifE(self, board, jeton, ligne, colone):
+        count = 0
+        for i in range(colone + 1, 8):
+            if board[ligne, i] == " ":
+                return False
+            elif board[ligne, i] == jeton:
+                if count != 0:
+                    self.mange(board, 0, 1, ligne, colone, jeton)
+                    return True
+                return False
+            else:
+                count += 1
+        return False
+
+    def verifO(self, board, jeton, ligne, colone):
+        count = 0
+        for i in range(colone - 1, -1, -1):
+            if board[ligne, i] == " ":
+                return False
+            elif board[ligne, i] == jeton:
+                if count != 0:
+                    self.mange(board, 0, -1, ligne, colone, jeton)
+                    return True
+                return False
+            else:
+                count += 1
+        return False
+
+    def verifS(self, board, jeton, ligne, colone):
+        count = 0
+        for i in range(ligne + 1, 8):
+            if board[i, colone] == " ":
+                return False
+            elif board[i, colone] == jeton:
+                if count != 0:
+                    self.mange(board, 1, 0, ligne, colone, jeton)
+                    return True
+                return False
+            else:
+                count += 1
+        return False
+
+    def verifN(self, board, jeton, ligne, colone):
+        count = 0
+        for i in range(ligne - 1, -1, -1):
+            if board[i, colone] == " ":
+                return False
+            elif board[i, colone] == jeton:
+                if count != 0:
+                    self.mange(board, -1, 0, ligne, colone, jeton)
+                    return True
+                return False
+            else:
+                count += 1
+        return False
+
+    def verifSE(self, board, jeton, ligne, colone):
+        count = 0
+        if ligne > colone:
+            max = ligne
+        else:
+            max = colone
+        for i in range(1, 8 - max):
+            if board[ligne + i, colone + i] == " ":
+                return False
+            elif board[ligne + i, colone + i] == jeton:
+                if count != 0:
+                    self.mange(board, 1, 1, ligne, colone, jeton)
+                    return True
+                return False
+            else:
+                count += 1
+        return False
+
+    def verifNO(self, board, jeton, ligne, colone):
+        count = 0
+        if ligne < colone:
+            min = ligne
+        else:
+            min = colone
+        for i in range(1, min):
+            if board[ligne - i, colone - i] == " ":
+                return False
+            elif board[ligne - i, colone - i] == jeton:
+                if count != 0:
+                    self.mange(board, -1, -1, ligne, colone, jeton)
+                    return True
+                return False
+            else:
+                count += 1
+        return False
+
+    def verifNE(self, board, jeton, ligne, colone):
+        count = 0
+        tmpColone = (colone + 7) - colone * 2
+        if ligne > tmpColone:
+            max = ligne
+        else:
+            max = colone
+        for i in range(1, 8 - max):
+            if board[ligne - i, colone + i] == " ":
+                return False
+            elif board[ligne - i, colone + i] == jeton:
+                if count != 0:
+                    self.mange(board, -1, 1, ligne, colone, jeton)
+                    return True
+                return False
+            else:
+                count += 1
+        return False
+
+    def verifSO(self, board, jeton, ligne, colone):
+        count = 0
+        tmpColone = (colone + 7) - colone * 2
+        if ligne < tmpColone:
+            max = ligne
+        else:
+            max = colone
+        for i in range(1, max):
+            if board[ligne + i, colone - i] == " ":
+                return False
+            elif board[ligne + i, colone - i] == jeton:
+                if count != 0:
+                    self.mange(board, 1, -1, ligne, colone, jeton)
+                    return True
+                return False
+            else:
+                count += 1
+        return False
+
+    def mange(self, board, dirLigne, dirColone, ligne, colone, jeton):
+        x = ligne + dirLigne
+        y = colone + dirColone
+        while board[x, y] != jeton:
+            board[x, y] = jeton
+            x += dirLigne
+            y += dirColone

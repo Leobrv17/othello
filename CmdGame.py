@@ -39,6 +39,7 @@ def main():
         totalBoard = np.vstack((topBoard, board), dtype=str)
     
 def testGoodPosition(board, jeton, ligne, colone):
+    print(ligne,colone)
     possibilite = []
     possibilite.append(verifN(board, jeton, ligne, colone))
     possibilite.append(verifNO(board, jeton, ligne, colone))
@@ -168,7 +169,7 @@ def verifSO(board, jeton, ligne, colone):
         max = ligne
     else:
         max = colone
-    for i in range(1, max+1):
+    for i in range(1, max):
         if board[ligne + i, colone - i] == " ":
             return False
         elif board[ligne + i, colone - i] == jeton:
