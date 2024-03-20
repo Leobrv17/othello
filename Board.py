@@ -242,6 +242,8 @@ class Board:
         else:
             max = colone - 1
         for i in range(1, 8 - max):
+            if colone + i == 8:
+                return False
             if board[ligne - i, colone + i] == 0:
                 return False
             elif board[ligne - i, colone + i] == jeton:
@@ -257,10 +259,12 @@ class Board:
         count = 0
         tmpColone = 7 - colone
         if ligne < tmpColone:
-            max = ligne
+            max = ligne - 1
         else:
             max = colone
         for i in range(1, max + 1):
+            if ligne + i == 8:
+                return False
             if board[ligne + i, colone - i] == 0:
                 return False
             elif board[ligne + i, colone - i] == jeton:
