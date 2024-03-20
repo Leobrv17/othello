@@ -66,30 +66,41 @@ class Board:
     def calc_case(self, event):
         col = (event.x - self.x_start) // self.case_size
         row = (event.y - self.y_start) // self.case_size
-        print(row,col)
+        print(row, col)
         if col >= 0 and row >= 0 and col < 8 and row < 8:
-            if self.matrice[row][col] == 0 and self.testGoodPosition(self.matrice,self.turn,row,col):
+            if self.matrice[row][col] == 0 and self.testGoodPosition(self.matrice, self.turn, row, col):
                 self.matrice[row][col] = self.turn
                 print(self.matrice)
 
                 if self.turn == 1:
-                    color = 'white'
                     self.turn = 2
                 else:
-                    color = 'black'
                     self.turn = 1
                 print(self.count_ones_and_twos())
                 self.update_turn_text()
-                self.write_circle(col, row, color)
+                self.new_matrice()
                 n, b = self.count_ones_and_twos()
                 self.update_black_pawn(b)
                 self.update_white_pawn(n)
+
+    def new_matrice(self):
+        self.Canvas.delete("pawn")
+        for i in range(8):
+            for j in range(8):
+                if self.matrice[j, i] != 0:
+                    if self.matrice[j, i] == 1:
+                        color = 'white'
+                        self.write_circle(i, j, color)
+                    else:
+                        color = 'black'
+                        self.write_circle(i, j, color)
 
     def write_circle(self, col, row, color):
         x_center = self.x_start + col * self.case_size + self.case_size // 2
         y_center = self.y_start + row * self.case_size + self.case_size // 2
         rayon = self.case_size // 2 - 5
-        self.Canvas.create_oval(x_center - rayon, y_center - rayon, x_center + rayon, y_center + rayon, fill=color)
+        self.Canvas.create_oval(x_center - rayon, y_center - rayon, x_center + rayon, y_center + rayon, fill=color,
+                                tags="pawn")
 
     def update_turn_text(self):
         self.Canvas.delete("turn_text")
@@ -134,7 +145,7 @@ class Board:
     def verifE(self, board, jeton, ligne, colone):
         count = 0
         for i in range(colone + 1, 8):
-            if board[ligne, i] == " ":
+            if board[ligne, i] == 0:
                 return False
             elif board[ligne, i] == jeton:
                 if count != 0:
@@ -148,7 +159,7 @@ class Board:
     def verifO(self, board, jeton, ligne, colone):
         count = 0
         for i in range(colone - 1, -1, -1):
-            if board[ligne, i] == " ":
+            if board[ligne, i] == 0:
                 return False
             elif board[ligne, i] == jeton:
                 if count != 0:
@@ -162,7 +173,7 @@ class Board:
     def verifS(self, board, jeton, ligne, colone):
         count = 0
         for i in range(ligne + 1, 8):
-            if board[i, colone] == " ":
+            if board[i, colone] == 0:
                 return False
             elif board[i, colone] == jeton:
                 if count != 0:
@@ -176,7 +187,7 @@ class Board:
     def verifN(self, board, jeton, ligne, colone):
         count = 0
         for i in range(ligne - 1, -1, -1):
-            if board[i, colone] == " ":
+            if board[i, colone] == 0:
                 return False
             elif board[i, colone] == jeton:
                 if count != 0:
@@ -194,7 +205,7 @@ class Board:
         else:
             max = colone
         for i in range(1, 8 - max):
-            if board[ligne + i, colone + i] == " ":
+            if board[ligne + i, colone + i] == 0:
                 return False
             elif board[ligne + i, colone + i] == jeton:
                 if count != 0:
@@ -212,7 +223,7 @@ class Board:
         else:
             min = colone
         for i in range(1, min):
-            if board[ligne - i, colone - i] == " ":
+            if board[ligne - i, colone - i] == 0:
                 return False
             elif board[ligne - i, colone - i] == jeton:
                 if count != 0:
@@ -229,9 +240,9 @@ class Board:
         if ligne > tmpColone:
             max = ligne
         else:
-            max = colone
+            max = colone - 1
         for i in range(1, 8 - max):
-            if board[ligne - i, colone + i] == " ":
+            if board[ligne - i, colone + i] == 0:
                 return False
             elif board[ligne - i, colone + i] == jeton:
                 if count != 0:
@@ -244,13 +255,13 @@ class Board:
 
     def verifSO(self, board, jeton, ligne, colone):
         count = 0
-        tmpColone = (colone + 7) - colone * 2
+        tmpColone = 7 - colone
         if ligne < tmpColone:
             max = ligne
         else:
             max = colone
-        for i in range(1, max):
-            if board[ligne + i, colone - i] == " ":
+        for i in range(1, max + 1):
+            if board[ligne + i, colone - i] == 0:
                 return False
             elif board[ligne + i, colone - i] == jeton:
                 if count != 0:
