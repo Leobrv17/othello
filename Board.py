@@ -60,8 +60,12 @@ class Board:
         self.write_circle(3, 3, "white")
         self.write_circle(4, 3, "black")
         self.write_circle(4, 4, "white")
-        bouton = tk.Button(self.Canvas, text="passer", command=self.passer)
-        bouton.place(x=780, y=750)
+        bouton_next = tk.Button(self.Canvas, text="passer", command=self.passer)
+        bouton_next.place(x=780, y=750)
+        bouton_regame = tk.Button(self.Canvas, text="Rejouer", command=self.regame)
+        bouton_regame.place(x=75, y=700)
+        bouton_quit = tk.Button(self.Canvas, text="Quiter", command=self.stop)
+        bouton_quit.place(x=77, y=750)
 
     def calc_case(self, event):
         col = (event.x - self.x_start) // self.case_size
@@ -283,3 +287,15 @@ class Board:
             board[x, y] = jeton
             x += dirLigne
             y += dirColone
+
+    def regame(self):
+        self.matrice = np.zeros((8, 8))
+        self.matrice[3][3] = 1
+        self.matrice[4][4] = 1
+        self.matrice[3][4] = 2
+        self.matrice[4][3] = 2
+        self.turn = 1
+        self.new_matrice()
+
+    def stop(self):
+        self.fenetre.destroy()
