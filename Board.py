@@ -234,14 +234,13 @@ class Board:
                 count += 1
         return False
 
-    def verifNE(self, board, jeton, ligne, colone):
+    def verifSO(self, board, jeton, ligne, colone):
         count = 0
-        tmpColone = (colone + 7) - colone * 2
-        if ligne > tmpColone:
-            max = ligne
+        if ligne < 7 - colone:
+            min = ligne
         else:
-            max = colone - 1
-        for i in range(1, 8 - max):
+            min = 7 - colone
+        for i in range(1, min+1):
             if colone + i == 8:
                 return False
             if board[ligne - i, colone + i] == 0:
@@ -255,14 +254,13 @@ class Board:
                 count += 1
         return False
 
-    def verifSO(self, board, jeton, ligne, colone):
+    def verifNE(self, board, jeton, ligne, colone):
         count = 0
-        tmpColone = 7 - colone
-        if ligne < tmpColone:
-            max = ligne - 1
+        if 7 - ligne < colone:
+            min = 7 - ligne
         else:
-            max = colone
-        for i in range(1, max + 1):
+            min = colone
+        for i in range(1, min + 1):
             if ligne + i == 8:
                 return False
             if board[ligne + i, colone - i] == 0:
