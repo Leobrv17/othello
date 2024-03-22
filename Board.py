@@ -5,12 +5,7 @@ import numpy as np
 
 class Board:
     def __init__(self):
-        self.matrice = np.zeros((8, 8))
-        self.matrice[3][3] = 1
-        self.matrice[4][4] = 1
-        self.matrice[3][4] = 2
-        self.matrice[4][3] = 2
-        print(self.matrice)
+        self.init_matrices()
         self.fenetre = tk.Tk()
         self.fenetre.geometry('920x820')
         self.fenetre.title('Othello')
@@ -20,7 +15,6 @@ class Board:
         self.case_size = 700 // 8
         print(self.case_size)
         self.Canvas.pack()
-        self.turn = 1
         self.write_board()
         self.update_turn_text()
         n, b = self.count_ones_and_twos()
@@ -289,13 +283,17 @@ class Board:
             y += dirColone
 
     def regame(self):
+        self.init_matrices()
+        self.new_matrice()
+
+    def stop(self):
+        self.fenetre.destroy()
+
+    def init_matrices(self):
         self.matrice = np.zeros((8, 8))
         self.matrice[3][3] = 1
         self.matrice[4][4] = 1
         self.matrice[3][4] = 2
         self.matrice[4][3] = 2
         self.turn = 1
-        self.new_matrice()
-
-    def stop(self):
-        self.fenetre.destroy()
+        print(self.matrice)
