@@ -2,10 +2,24 @@ import tkinter as tk
 
 import numpy as np
 
+from Matrice import Matrice
+
+
+class MyButton(tk.Button):
+    def __init__(self, master, texte, fonction):
+        tk.Button.__init__(self)
+        self.configure(text=texte, command=fonction)
+        self.configure(height=1,
+                       width=10,
+                       bg='#347940',
+                       fg='white',
+                       font=('Calibri', 10, 'bold'))
+
 
 class Board:
     def __init__(self):
-        self.init_matrices()
+        self.my_matrice = Matrice()
+        self.turn = 1
         self.fenetre = tk.Tk()
         self.fenetre.geometry('920x820')
         self.fenetre.title('Othello')
@@ -16,10 +30,11 @@ class Board:
         self.Canvas.pack()
         self.write_board()
         self.update_turn_text()
-        n, b = self.count_ones_and_twos()
+        n, b = self.my_matrice.count_ones_and_twos()
         self.update_black_pawn(b)
         self.update_white_pawn(n)
         self.Canvas.bind("<Button-1>", self.calc_case)
+        self.winner = None
 
     def write_board(self):
         self.Canvas.create_rectangle(0, 0, 200, 820, fill="#2f1b0c")  # gauche
@@ -53,43 +68,58 @@ class Board:
         self.write_circle(3, 3, "white")
         self.write_circle(4, 3, "black")
         self.write_circle(4, 4, "white")
-        bouton_next = tk.Button(self.Canvas, text="passer", command=self.passer)
+        bouton_next = MyButton(self.Canvas, "Passer", self.passer)
         bouton_next.place(x=780, y=750)
-        bouton_regame = tk.Button(self.Canvas, text="Rejouer", command=self.regame)
+        bouton_regame = MyButton(self.Canvas, "Rejouer", self.regame)
         bouton_regame.place(x=75, y=700)
-        bouton_quit = tk.Button(self.Canvas, text="Quiter", command=self.stop)
+        bouton_quit = MyButton(self.Canvas, "Quiter", self.stop)
         bouton_quit.place(x=77, y=750)
 
     def calc_case(self, event):
         col = (event.x - self.x_start) // self.case_size
         row = (event.y - self.y_start) // self.case_size
+        print(row, col)
         if col >= 0 and row >= 0 and col < 8 and row < 8:
-            if self.matrice[row][col] == 0 and self.testGoodPosition(self.matrice, self.turn, row, col, True):
-                self.matrice[row][col] = self.turn
+            if self.my_matrice.matrice[row][col] == 0 and self.my_matrice.testGoodPosition(self.turn, row, col, True):
+                self.my_matrice.matrice[row][col] = self.turn
+                print(self.my_matrice.matrice)
 
                 if self.turn == 1:
                     self.turn = 2
                 else:
                     self.turn = 1
+                print(self.my_matrice.count_ones_and_twos())
                 self.update_turn_text()
                 self.new_matrice()
-                n, b = self.count_ones_and_twos()
+                n, b = self.my_matrice.count_ones_and_twos()
                 self.update_black_pawn(b)
                 self.update_white_pawn(n)
-                
-                playablePos = []
-                for x in range(8):
-                    for y in range(8):
-                        if (self.matrice[y, x] == 0 and self.testGoodPosition(self.matrice, self.turn, x, y, False)):
-                            playablePos.append([y, x])
-                print(playablePos)
+
+        if not any(0 in i for i in self.my_matrice.matrice):
+            nombre_1 = np.count_nonzero(self.my_matrice.matrice == 1)
+            nombre_2 = np.count_nonzero(self.my_matrice.matrice == 2)
+            if nombre_1 > nombre_2:
+                self.winner = 1
+                self.update_text_endgame()
+            elif nombre_2 > nombre_1:
+                self.winner = 2
+                self.update_text_endgame()
+            else:
+                self.winner = 0
+                self.update_text_endgame()
+        if not any(1 in i for i in self.my_matrice.matrice):
+            self.winner = 2
+            self.update_text_endgame()
+        if not any(2 in i for i in self.my_matrice.matrice):
+            self.winner = 1
+            self.update_text_endgame()
 
     def new_matrice(self):
         self.Canvas.delete("pawn")
         for i in range(8):
             for j in range(8):
-                if self.matrice[j, i] != 0:
-                    if self.matrice[j, i] == 1:
+                if self.my_matrice.matrice[j, i] != 0:
+                    if self.my_matrice.matrice[j, i] == 1:
                         color = 'white'
                         self.write_circle(i, j, color)
                     else:
@@ -120,207 +150,27 @@ class Board:
                                 tags="white_pawn")
 
     def passer(self):
-        if self.turn == 1:
-            self.turn = 2
-        else:
-            self.turn = 1
-        self.update_turn_text()
-
-    def count_ones_and_twos(self):
-        count_ones = np.count_nonzero(self.matrice == 1)
-        count_twos = np.count_nonzero(self.matrice == 2)
-        return count_ones, count_twos
-
-    def testGoodPosition(self, board, jeton, ligne, colone, doEat):
-        possibilite = []
-        possibilite.append(self.verifN(board, jeton, ligne, colone, doEat))
-        possibilite.append(self.verifNO(board, jeton, ligne, colone, doEat))
-        possibilite.append(self.verifO(board, jeton, ligne, colone, doEat))
-        possibilite.append(self.verifSO(board, jeton, ligne, colone, doEat))
-        possibilite.append(self.verifS(board, jeton, ligne, colone, doEat))
-        possibilite.append(self.verifSE(board, jeton, ligne, colone, doEat))
-        possibilite.append(self.verifE(board, jeton, ligne, colone, doEat))
-        possibilite.append(self.verifNE(board, jeton, ligne, colone, doEat))
-        count = sum(sub_array[1] for sub_array in possibilite)
-        if (ligne == 0 and colone == 0 or ligne == 7 and colone == 7 or ligne == 7 and colone == 0 or ligne == 0 and colone == 7):
-            count += 20
-        elif(ligne == 0 or ligne == 7 or colone == 0 or colone == 7):
-            count += 5
-        return np.any(possibilite)
-
-    def verifE(self, board, jeton, ligne, colone, doEat):
-        count = 0
-        if (self.matrice[ligne, colone] == 0):
-            for i in range(colone + 1, 8):
-                if board[ligne, i] == 0:
-                    return [False, 0]
-                elif board[ligne, i] == jeton:
-                    if count != 0:
-                        if doEat:
-                            self.mange(board, 0, 1, ligne, colone, jeton)
-                        return [True, count]
-                    return [False, 0]
-                else:
-                    count += 1
-        return [False, 0]
-
-    def verifO(self, board, jeton, ligne, colone, doEat):
-        count = 0
-        if (self.matrice[ligne, colone] == 0):
-            for i in range(colone - 1, -1, -1):
-                if board[ligne, i] == 0:
-                    return [False, 0]
-                elif board[ligne, i] == jeton:
-                    if count != 0:
-                        if doEat:
-                            self.mange(board, 0, -1, ligne, colone, jeton)
-                        return [True, count]
-                    return [False, 0]
-                else:
-                    count += 1
-        return [False, 0]
-
-    def verifS(self, board, jeton, ligne, colone, doEat):
-        count = 0
-        if (self.matrice[ligne, colone] == 0):
-            for i in range(ligne + 1, 8):
-                if board[i, colone] == 0:
-                    return [False, 0]
-                elif board[i, colone] == jeton:
-                    if count != 0:
-                        if doEat:
-                            self.mange(board, 1, 0, ligne, colone, jeton)
-                        return [True, count]
-                    return [False, 0]
-                else:
-                    count += 1
-        return [False, 0]
-
-    def verifN(self, board, jeton, ligne, colone, doEat):
-        count = 0
-        if (self.matrice[ligne, colone] == 0):
-            for i in range(ligne - 1, -1, -1):
-                if board[i, colone] == 0:
-                    return [False, 0]
-                elif board[i, colone] == jeton:
-                    if count != 0:
-                        if doEat:
-                            self.mange(board, -1, 0, ligne, colone, jeton)
-                        return [True, count]
-                    return [False, 0]
-                else:
-                    count += 1
-        return [False, 0]
-
-    def verifSE(self, board, jeton, ligne, colone, doEat):
-        count = 0
-        if (self.matrice[ligne, colone] == 0):
-            if ligne > colone:
-                max = ligne
+        if self.winner == None:
+            if self.turn == 1:
+                self.turn = 2
             else:
-                max = colone
-            for i in range(1, 8 - max):
-                if board[ligne + i, colone + i] == 0:
-                    return [False, 0]
-                elif board[ligne + i, colone + i] == jeton:
-                    if count != 0:
-                        if doEat:
-                            self.mange(board, 1, 1, ligne, colone, jeton)
-                        return [True, count]
-                    return [False, 0]
-                else:
-                    count += 1
-        return [False, 0]
-
-    def verifNO(self, board, jeton, ligne, colone, doEat):
-        count = 0
-        if (self.matrice[ligne, colone] == 0):
-            if ligne < colone:
-                min = ligne
-            else:
-                min = colone
-            for i in range(1, min):
-                if board[ligne - i, colone - i] == 0:
-                    return [False, 0]
-                elif board[ligne - i, colone - i] == jeton:
-                    if count != 0:
-                        if doEat:
-                            self.mange(board, -1, -1, ligne, colone, jeton)
-                        return [True, count]
-                    return [False, 0]
-                else:
-                    count += 1
-        return [False, 0]
-
-    def verifSO(self, board, jeton, ligne, colone, doEat):
-        count = 0
-        if (self.matrice[ligne, colone] == 0):
-            if ligne < 7 - colone:
-                min = ligne
-            else:
-                min = 7 - colone
-            for i in range(1, min+1):
-                if colone + i == 8:
-                    return [False, 0]
-                if board[ligne - i, colone + i] == 0:
-                    return [False, 0]
-                elif board[ligne - i, colone + i] == jeton:
-                    if count != 0:
-                        if doEat:
-                            self.mange(board, -1, 1, ligne, colone, jeton)
-                        return [True, count]
-                    return [False, 0]
-                else:
-                    count += 1
-        return [False, 0]
-
-    def verifNE(self, board, jeton, ligne, colone, doEat):
-        count = 0
-        if (self.matrice[ligne, colone] == 0):
-            if 7 - ligne < colone:
-                min = 7 - ligne
-            else:
-                min = colone
-            for i in range(1, min + 1):
-                if ligne + i == 8:
-                    return [False, 0]
-                if board[ligne + i, colone - i] == 0:
-                    return [False, 0]
-                elif board[ligne + i, colone - i] == jeton:
-                    if count != 0:
-                        if doEat:
-                            self.mange(board, 1, -1, ligne, colone, jeton)
-                        return [True, count]
-                    return [False, 0]
-                else:
-                    count += 1
-        return [False, 0]
-
-    def mange(self, board, dirLigne, dirColone, ligne, colone, jeton):
-        x = ligne + dirLigne
-        y = colone + dirColone
-        while board[x, y] != jeton:
-            board[x, y] = jeton
-            x += dirLigne
-            y += dirColone
+                self.turn = 1
+            self.update_turn_text()
 
     def regame(self):
-        self.init_matrices()
+        self.my_matrice = Matrice()
         self.new_matrice()
+        self.turn = 1
 
     def stop(self):
         self.fenetre.destroy()
 
-    def init_matrices(self):
-        self.matrice = np.zeros((8, 8))
-        self.matrice[3][3] = 1
-        self.matrice[4][4] = 1
-        self.matrice[3][4] = 2
-        self.matrice[4][3] = 2
-        self.turn = 1
-        playablePos = []
-        for x in range(8):
-            for y in range(8):
-                if (self.matrice[y, x] == 0 and self.testGoodPosition(self.matrice, self.turn, x, y, False)):
-                    playablePos.append([x, y])
-        print(playablePos)
+    def update_text_endgame(self):
+        self.Canvas.delete("turn_text")
+        text = "Egalité"
+        if self.winner == 1:
+            text = "Blanc Gagne"
+        elif self.winner == 2:
+            text = "Noir Gagne"
+        self.Canvas.create_text(560, 765, text=text, fill="white", font=('Arial', 20),
+                                tags="turn_text")
