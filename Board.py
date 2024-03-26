@@ -65,7 +65,7 @@ class Board:
         row = (event.y - self.y_start) // self.case_size
         print(row, col)
         if col >= 0 and row >= 0 and col < 8 and row < 8:
-            if self.matrice[row][col] == 0 and self.testGoodPosition(self.matrice, self.turn, row, col):
+            if self.matrice[row][col] == 0 and self.testGoodPosition(self.matrice, self.turn, row, col,True):
                 self.matrice[row][col] = self.turn
                 print(self.matrice)
 
@@ -80,14 +80,12 @@ class Board:
                 self.update_black_pawn(b)
                 self.update_white_pawn(n)
 
-
                 playablePos = []
                 for x in range(8):
                     for y in range(8):
                         if (self.matrice[y, x] == 0 and self.testGoodPosition(self.matrice, self.turn, x, y, False)):
                             playablePos.append([y, x])
                 print(playablePos)
-
 
         if not any(0 in i for i in self.matrice):
             nombre_1 = np.count_nonzero(self.matrice == 1)
