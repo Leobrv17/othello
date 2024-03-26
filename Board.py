@@ -13,7 +13,6 @@ class Board:
         self.x_start = 200
         self.y_start = 20
         self.case_size = 700 // 8
-        print(self.case_size)
         self.Canvas.pack()
         self.write_board()
         self.update_turn_text()
@@ -21,6 +20,7 @@ class Board:
         self.update_black_pawn(b)
         self.update_white_pawn(n)
         self.Canvas.bind("<Button-1>", self.calc_case)
+        self.winner = None
 
     def write_board(self):
         self.Canvas.create_rectangle(0, 0, 200, 820, fill="#2f1b0c")  # gauche
@@ -62,27 +62,47 @@ class Board:
         bouton_quit.place(x=77, y=750)
 
     def calc_case(self, event):
-        col = (event.x - self.x_start) // self.case_size
-        row = (event.y - self.y_start) // self.case_size
-        print(row, col)
-        if col >= 0 and row >= 0 and col < 8 and row < 8:
-            if self.matrice[row][col] == 0 and self.testGoodPosition(self.matrice, self.turn, row, col):
-                self.matrice[row][col] = self.turn
-                print(self.matrice)
+        if self.winner == None:
+            col = (event.x - self.x_start) // self.case_size
+            row = (event.y - self.y_start) // self.case_size
+            print(row, col)
+            if col >= 0 and row >= 0 and col < 8 and row < 8:
+                if self.matrice[row][col] == 0 and self.testGoodPosition(self.matrice, self.turn, row, col):
+                    self.matrice[row][col] = self.turn
+                    print(self.matrice)
 
-                if self.turn == 1:
-                    self.turn = 2
+                    if self.turn == 1:
+                        self.turn = 2
+                    else:
+                        self.turn = 1
+                    print(self.count_ones_and_twos())
+                    self.update_turn_text()
+                    self.new_matrice()
+                    n, b = self.count_ones_and_twos()
+                    self.update_black_pawn(b)
+                    self.update_white_pawn(n)
+            if not any(0 in i for i in self.matrice):
+                nombre_1 = np.count_nonzero(self.matrice == 1)
+                nombre_2 = np.count_nonzero(self.matrice == 2)
+                if nombre_1 > nombre_2:
+                    self.winner = 1
+                    self.update_text_endgame()
+                elif nombre_2 > nombre_1:
+                    self.winner = 2
+                    self.update_text_endgame()
                 else:
-                    self.turn = 1
-                print(self.count_ones_and_twos())
-                self.update_turn_text()
-                self.new_matrice()
-                n, b = self.count_ones_and_twos()
-                self.update_black_pawn(b)
-                self.update_white_pawn(n)
+                    self.winner = 0
+                    self.update_text_endgame()
+            if not any(1 in i for i in self.matrice):
+                self.winner = 2
+                self.update_text_endgame()
+            if not any(2 in i for i in self.matrice):
+                self.winner = 1
+                self.update_text_endgame()
 
     def new_matrice(self):
         self.Canvas.delete("pawn")
+        self.winner = None
         for i in range(8):
             for j in range(8):
                 if self.matrice[j, i] != 0:
@@ -106,6 +126,16 @@ class Board:
         self.Canvas.create_text(560, 765, text=f"Au tour du joueur {player}", fill="white", font=('Arial', 20),
                                 tags="turn_text")
 
+    def update_text_endgame(self):
+        self.Canvas.delete("turn_text")
+        text = "Egalité"
+        if self.winner == 1:
+            text = "Blanc Gagne"
+        elif self.winner == 2:
+            text = "Noir Gagne"
+        self.Canvas.create_text(560, 765, text=text, fill="white", font=('Arial', 20),
+                                tags="turn_text")
+
     def update_black_pawn(self, nb):
         self.Canvas.delete("black_pawn")
         self.Canvas.create_text(230, 740, text=f"N : {nb}", fill="white", font=('Arial', 15),
@@ -117,11 +147,12 @@ class Board:
                                 tags="white_pawn")
 
     def passer(self):
-        if self.turn == 1:
-            self.turn = 2
-        else:
-            self.turn = 1
-        self.update_turn_text()
+        if self.winner == None:
+            if self.turn == 1:
+                self.turn = 2
+            else:
+                self.turn = 1
+            self.update_turn_text()
 
     def count_ones_and_twos(self):
         count_ones = np.count_nonzero(self.matrice == 1)
@@ -238,7 +269,7 @@ class Board:
             min = ligne
         else:
             min = 7 - colone
-        for i in range(1, min+1):
+        for i in range(1, min + 1):
             if colone + i == 8:
                 return False
             if board[ligne - i, colone + i] == 0:
