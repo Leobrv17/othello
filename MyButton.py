@@ -1,4 +1,4 @@
-import tk
+import tkinter as tk
 
 
 class MyButton(tk.Button):

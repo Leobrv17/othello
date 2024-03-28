@@ -2,10 +2,9 @@ import tkinter as tk
 
 import numpy as np
 
+from IA import IA
 from Matrice import Matrice
 from MyButton import MyButton
-
-
 
 
 class Board:
@@ -27,6 +26,9 @@ class Board:
         self.update_white_pawn(n)
         self.Canvas.bind("<Button-1>", self.calc_case)
         self.winner = None
+        self.Joeur1 = None
+        self.Joeur2 = None
+
 
     def write_board(self):
         self.Canvas.create_rectangle(0, 0, 200, 820, fill="#2f1b0c")  # gauche
@@ -66,6 +68,8 @@ class Board:
         bouton_regame.place(x=75, y=700)
         bouton_quit = MyButton(self.Canvas, "Quiter", self.stop)
         bouton_quit.place(x=77, y=750)
+        self.bouton_change_mod = MyButton(self.Canvas, "J1 VS J2", self.change_mod)
+        self.bouton_change_mod.place(x=65, y=100)
 
     def calc_case(self, event):
         col = (event.x - self.x_start) // self.case_size
@@ -166,3 +170,20 @@ class Board:
             text = "Noir Gagne"
         self.Canvas.create_text(560, 765, text=text, fill="white", font=('Arial', 20),
                                 tags="turn_text")
+
+    def change_mod(self):
+        if self.Joeur1 == None and self.Joeur2 == None:
+            self.regame()
+            self.bouton_change_mod.config(text="J1 VS IA")
+            self.Joeur2 = IA()
+            print(self.Joeur2)
+        elif self.Joeur1 == None and self.Joeur2 != None:
+            self.regame()
+            self.bouton_change_mod.config(text="IA VS IA")
+            self.Joeur1 = IA()
+
+        elif self.Joeur1 != None and self.Joeur2 != None:
+            self.regame()
+            self.bouton_change_mod.config(text="J1 VS J2")
+            self.Joeur1 = None
+            self.Joeur2 = None
