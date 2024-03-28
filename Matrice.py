@@ -188,3 +188,6 @@ class Matrice:
             self.matrice[x, y] = jeton
             x += dirLigne
             y += dirColone
+
+    def afficher(self):
+        print(self.matrice)
