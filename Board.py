@@ -29,7 +29,6 @@ class Board:
         self.Joeur1 = None
         self.Joeur2 = None
 
-
     def write_board(self):
         self.Canvas.create_rectangle(0, 0, 200, 820, fill="#2f1b0c")  # gauche
         self.Canvas.create_rectangle(200, 717, 920, 820, fill="#2f1b0c")  # Bas
@@ -77,15 +76,15 @@ class Board:
             col = (event.x - self.x_start) // self.case_size
             row = (event.y - self.y_start) // self.case_size
             if col >= 0 and row >= 0 and col < 8 and row < 8:
-                if self.my_matrice.matrice[row][col] == 0 and self.my_matrice.testGoodPosition(self.turn, row, col,
-                                                                                               True):
+                test, count = self.my_matrice.testGoodPosition(self.turn, row, col, True)
+                if self.my_matrice.matrice[row][col] == 0 and test:
                     self.my_matrice.matrice[row][col] = self.turn
                     self.changeTurnAndAffichage()
 
 
         elif (self.Joeur2 != None and self.turn == 2):
             res = self.Joeur2.play(self.my_matrice, self.turn)
-            if res==False:
+            if res == False:
                 self.ia_pass()
             else:
                 self.new_matrice()
@@ -181,7 +180,6 @@ class Board:
             self.bouton_change_mod.config(text="IA VS IA")
             self.Joeur1 = IA()
             self.Joeur2 = IA()
-            print("hello")
 
         elif self.Joeur1 != None and self.Joeur2 != None:
             self.regame()

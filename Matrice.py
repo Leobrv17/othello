@@ -27,12 +27,7 @@ class Matrice:
         possibilite.append(self.verifE(jeton, ligne, colone, doEat))
         possibilite.append(self.verifNE(jeton, ligne, colone, doEat))
         count = sum(sub_array[1] for sub_array in possibilite)
-        if (
-                ligne == 0 and colone == 0 or ligne == 7 and colone == 7 or ligne == 7 and colone == 0 or ligne == 0 and colone == 7):
-            count += 20
-        elif (ligne == 0 or ligne == 7 or colone == 0 or colone == 7):
-            count += 5
-        return np.any(possibilite)
+        return np.any(possibilite),count
 
     def verifE(self, jeton, ligne, colone, doEat):
         count = 0
