@@ -84,14 +84,20 @@ class Board:
 
 
         elif (self.Joeur2 != None and self.turn == 2):
-            self.Joeur2.play(self.my_matrice, self.turn)
-            self.new_matrice()
-            self.changeTurnAndAffichage()
+            res = self.Joeur2.play(self.my_matrice, self.turn)
+            if res==False:
+                self.ia_pass()
+            else:
+                self.new_matrice()
+                self.changeTurnAndAffichage()
 
         elif (self.Joeur1 != None and self.turn == 1):
-            self.Joeur1.play(self.my_matrice, self.turn)
-            self.new_matrice()
-            self.changeTurnAndAffichage()
+            res = self.Joeur1.play(self.my_matrice, self.turn)
+            if res == False:
+                self.ia_pass()
+            else:
+                self.new_matrice()
+                self.changeTurnAndAffichage()
 
         self.testWin()
 
@@ -213,3 +219,15 @@ class Board:
         n, b = self.my_matrice.count_ones_and_twos()
         self.update_black_pawn(b)
         self.update_white_pawn(n)
+
+    def ia_pass(self):
+        if self.winner == None:
+            if self.turn == 1:
+                self.turn = 2
+            else:
+                self.turn = 1
+            self.update_turn_text()
+        else:
+            self.Canvas.delete("turn_text")
+            self.Canvas.create_text(560, 765, text=f"Vous ne pouvez pas passer", fill="white", font=('Arial', 20),
+                                    tags="turn_text")
