@@ -16,6 +16,7 @@ class IA:
 
     def play(self, matrice, turn):
         playablePos = self.testAllPossition(matrice, turn)
-        mouvePlay = playablePos[randint(0, len(playablePos)-1)]
+        print(playablePos)
+        mouvePlay = playablePos[randint(0, len(playablePos) - 1)]
         matrice.testGoodPosition(turn, mouvePlay[1], mouvePlay[0], True)
         matrice.matrice[mouvePlay[1]][mouvePlay[0]] = turn

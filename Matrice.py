@@ -10,6 +10,7 @@ class Matrice:
         self.matrice[4][3] = 2
         self.turn = 1
         playablePos = []
+
     def count_ones_and_twos(self):
         count_ones = np.count_nonzero(self.matrice == 1)
         count_twos = np.count_nonzero(self.matrice == 2)
@@ -42,7 +43,7 @@ class Matrice:
                 elif self.matrice[ligne, i] == jeton:
                     if count != 0:
                         if doEat:
-                            self.mange( 0, 1, ligne, colone, jeton)
+                            self.mange(0, 1, ligne, colone, jeton)
                         return [True, count]
                     return [False, 0]
                 else:
@@ -58,7 +59,7 @@ class Matrice:
                 elif self.matrice[ligne, i] == jeton:
                     if count != 0:
                         if doEat:
-                            self.mange( 0, -1, ligne, colone, jeton)
+                            self.mange(0, -1, ligne, colone, jeton)
                         return [True, count]
                     return [False, 0]
                 else:
@@ -74,7 +75,7 @@ class Matrice:
                 elif self.matrice[i, colone] == jeton:
                     if count != 0:
                         if doEat:
-                            self.mange( 1, 0, ligne, colone, jeton)
+                            self.mange(1, 0, ligne, colone, jeton)
                         return [True, count]
                     return [False, 0]
                 else:
@@ -90,7 +91,7 @@ class Matrice:
                 elif self.matrice[i, colone] == jeton:
                     if count != 0:
                         if doEat:
-                            self.mange( -1, 0, ligne, colone, jeton)
+                            self.mange(-1, 0, ligne, colone, jeton)
                         return [True, count]
                     return [False, 0]
                 else:
@@ -110,7 +111,7 @@ class Matrice:
                 elif self.matrice[ligne + i, colone + i] == jeton:
                     if count != 0:
                         if doEat:
-                            self.mange( 1, 1, ligne, colone, jeton)
+                            self.mange(1, 1, ligne, colone, jeton)
                         return [True, count]
                     return [False, 0]
                 else:
@@ -130,7 +131,7 @@ class Matrice:
                 elif self.matrice[ligne - i, colone - i] == jeton:
                     if count != 0:
                         if doEat:
-                            self.mange( -1, -1, ligne, colone, jeton)
+                            self.mange(-1, -1, ligne, colone, jeton)
                         return [True, count]
                     return [False, 0]
                 else:
@@ -152,7 +153,7 @@ class Matrice:
                 elif self.matrice[ligne - i, colone + i] == jeton:
                     if count != 0:
                         if doEat:
-                            self.mange( -1, 1, ligne, colone, jeton)
+                            self.mange(-1, 1, ligne, colone, jeton)
                         return [True, count]
                     return [False, 0]
                 else:
@@ -174,7 +175,7 @@ class Matrice:
                 elif self.matrice[ligne + i, colone - i] == jeton:
                     if count != 0:
                         if doEat:
-                            self.mange( 1, -1, ligne, colone, jeton)
+                            self.mange(1, -1, ligne, colone, jeton)
                         return [True, count]
                     return [False, 0]
                 else:

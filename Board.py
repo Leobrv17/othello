@@ -29,6 +29,7 @@ class Board:
         self.Joeur1 = None
         self.Joeur2 = None
 
+
     def write_board(self):
         self.Canvas.create_rectangle(0, 0, 200, 820, fill="#2f1b0c")  # gauche
         self.Canvas.create_rectangle(200, 717, 920, 820, fill="#2f1b0c")  # Bas
