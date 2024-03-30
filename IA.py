@@ -30,9 +30,9 @@ class IA:
             count += my_list[i][1]
             col, row = my_list[i][0]
             if row == 0 and col == 0 or row == 7 and col == 7 or row == 7 and col == 0 or row == 0 and col == 7:
-                count += 10
+                count += 100
             elif row == 0 or row == 7 or col == 0 or col == 7:
-                count += 5
+                count += 30
             if (col == 1 or col == 6) and (row == 1 or row == 6):
                 count -= 100
             my_list[i][1] = count
