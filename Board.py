@@ -154,6 +154,7 @@ class Board:
 
     def regame(self):
         self.my_matrice = Matrice()
+        self.winner=None
         self.new_matrice()
         self.turn = 1
 
@@ -175,6 +176,7 @@ class Board:
             self.regame()
             self.bouton_change_mod.config(text="J1 VS IA")
             self.Joeur2 = IA()
+
         elif self.Joeur1 == None and self.Joeur2 != None:
             self.regame()
             self.bouton_change_mod.config(text="IA VS IA")
